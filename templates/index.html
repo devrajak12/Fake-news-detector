@@ -1,0 +1,203 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detector</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            padding: 40px 16px;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            width: 100%;
+            max-width: 680px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+        .subtitle { color: #666; font-size: 14px; margin-bottom: 28px; }
+
+        textarea {
+            width: 100%;
+            height: 160px;
+            padding: 12px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        textarea:focus { border-color: #4a90e2; }
+
+        button {
+            margin-top: 12px;
+            width: 100%;
+            padding: 12px;
+            background: #2d2d2d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover { background: #444; }
+
+        .error {
+            margin-top: 16px;
+            padding: 12px 14px;
+            background: #fff3f3;
+            border: 1px solid #ffcccc;
+            border-radius: 8px;
+            color: #cc0000;
+            font-size: 14px;
+        }
+
+        .result {
+            margin-top: 24px;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .result.fake {
+            background: #fff3f3;
+            border: 1px solid #ffaaaa;
+        }
+        .result.real {
+            background: #f0fff4;
+            border: 1px solid #aaddaa;
+        }
+
+        .verdict {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+        .fake .verdict { color: #cc0000; }
+        .real .verdict { color: #1a7a3c; }
+
+        .confidence {
+            font-size: 14px;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        .confidence-bar-wrap {
+            background: #eee;
+            border-radius: 99px;
+            height: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .confidence-bar {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.5s ease;
+        }
+        .fake .confidence-bar  { background: #e05555; }
+        .real .confidence-bar  { background: #3aaa6a; }
+
+        .details {
+            margin-top: 20px;
+            padding: 14px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #555;
+            text-align: left;
+        }
+        .details strong { color: #333; }
+
+        .examples {
+            margin-top: 24px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .examples p { font-size: 13px; color: #888; margin-bottom: 10px; }
+        .example-btn {
+            width: auto;
+            padding: 7px 14px;
+            font-size: 12px;
+            background: #f0f0f0;
+            color: #333;
+            border-radius: 20px;
+            margin: 4px 4px 0 0;
+            display: inline-block;
+        }
+        .example-btn:hover { background: #e0e0e0; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>Fake News Detector</h1>
+    <p class="subtitle">Paste a news article or headline to check if it might be fabricated.</p>
+
+    <form action="/predict" method="POST">
+        <textarea
+            name="news_text"
+            placeholder="Paste your news article or headline here..."
+            required
+        >{{ news_text or '' }}</textarea>
+
+        <button type="submit">Analyze Article</button>
+    </form>
+
+    <!-- Error message -->
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <!-- Prediction result -->
+    {% if prediction %}
+    <div class="result {{ prediction | lower }}">
+        <div class="verdict">{{ prediction }}</div>
+        <div class="confidence">Confidence: {{ confidence }}%</div>
+        <div class="confidence-bar-wrap">
+            <div class="confidence-bar" style="width: {{ confidence }}%"></div>
+        </div>
+    </div>
+
+    <div class="details">
+        <strong>Cleaned text sent to model:</strong><br>
+        {{ cleaned_text }}
+    </div>
+    {% endif %}
+
+    <!-- Example buttons -->
+    <div class="examples">
+        <p>Try an example:</p>
+        <button class="example-btn" onclick="fillExample(this)"
+            data-text="Scientists publish new research confirming vaccine effectiveness at 94 percent according to peer reviewed study.">
+            Real-style headline
+        </button>
+        <button class="example-btn" onclick="fillExample(this)"
+            data-text="SHOCKING truth government hiding secret cure exposed by insider sources mainstream media won't tell you.">
+            Fake-style headline
+        </button>
+    </div>
+
+</div>
+
+<script>
+function fillExample(btn) {
+    document.querySelector('textarea[name="news_text"]').value = btn.dataset.text;
+}
+</script>
+</body>
+</html>

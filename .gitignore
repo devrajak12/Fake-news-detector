@@ -1,0 +1,31 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+.env/
+*.env
+
+# Model files (too large for GitHub)
+model/*.pkl
+model/*.joblib
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code settings
+.vscode/
+
+# NLTK data (user downloads this themselves)
+nltk_data/
+
+# Logs
+*.log
